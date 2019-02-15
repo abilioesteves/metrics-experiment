@@ -1,0 +1,90 @@
+# docker stack deploy -c docker-compose.yml prom-experiment
+version: '3.3'
+
+services:
+
+  pn2:
+    image: barimetrics-mobile/pn2:0.0.1
+    build:
+      context: .
+      dockerfile: federate/Dockerfile
+      args:
+        scrapeinterval: 30s
+        evaluationinterval: 10s
+        scrapetimeout: 10s
+        tsdbretention: 2h
+        rulespath: rules
+        startupfile: federate/startup.sh
+        prometheusname: n2
+        federatehostprefix: p
+        federatehostsufix: :9090
+        federatetargets: n1-1 n1-2
+    ports:
+      - 9079:9090
+
+  pn1-1:
+    image: barimetrics-mobile/pn1-1:0.0.1
+    build:
+      context: .
+      dockerfile: scrape/Dockerfile
+      args:
+        scrapeinterval: 15s
+        evaluationinterval: 10s
+        scrapetimeout: 10s
+        tsdbretention: 2h
+        targetsfile: 1-targets.json
+        rulespath: rules
+        startupfile: scrape/startup.sh
+        region: 1
+        service: release
+        prometheusname: n1-1
+    ports:
+      - 9080:9090
+
+  pn1-2:
+    image: barimetrics-mobile/pn1-2:0.0.1
+    build:
+      context: .
+      dockerfile: scrape/Dockerfile
+      args:
+        scrapeinterval: 15s
+        evaluationinterval: 10s
+        scrapetimeout: 10s
+        tsdbretention: 2h
+        targetsfile: 2-targets.json
+        rulespath: rules
+        startupfile: scrape/startup.sh
+        region: g2
+        service: release
+        prometheusname: n1-2
+    ports:
+      - 9091:9090
+
+  metrics1:
+    image: abilioesteves/metrics-generator:1.0.0
+    ports:
+      - 32865:32865
+
+  metrics2: 
+    image: abilioesteves/metrics-generator:1.0.0
+    ports:
+      - 32866:32865
+
+  grafana:
+    image: flaviostutz/grafana
+    ports:
+      - 4000:3000
+    volumes:
+      - grafana:/data
+
+volumes:
+  grafana:
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.5.0/24
+
+

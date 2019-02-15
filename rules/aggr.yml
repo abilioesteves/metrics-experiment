@@ -1,0 +1,13 @@
+groups:
+- name: aggr
+  rules:
+  - record: http_requests_seconds_histogram_sum:irate
+    expr: sum(irate(http_requests_seconds_histogram_sum{instance!="$PROMETHEUS_NAME"}[1m])) without (instance)
+    labels:
+      instance: $PROMETHEUS_NAME
+
+  - record: http_requests_seconds_histogram_count:irate
+    expr: sum(irate(http_requests_seconds_histogram_count{instance!="$PROMETHEUS_NAME"}[1m])) without (instance)
+    labels:
+      instance: $PROMETHEUS_NAME
+      
