@@ -54,7 +54,7 @@ services:
         targetsfile: 2-targets.json
         rulespath: rules
         startupfile: scrape/startup.sh
-        region: g2
+        region: 2
         service: release
         prometheusname: n1-2
     ports:
