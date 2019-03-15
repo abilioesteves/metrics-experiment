@@ -4,7 +4,7 @@ version: '3.3'
 services:
 
   pn2:
-    image: barimetrics-mobile/pn2:0.0.1
+    image: metrics-experiment/pn2:0.0.1
     build:
       context: .
       dockerfile: federate/Dockerfile
@@ -23,7 +23,7 @@ services:
       - 9079:9090
 
   pn1-1:
-    image: barimetrics-mobile/pn1-1:0.0.1
+    image: metrics-experiment/pn1-1:0.0.1
     build:
       context: .
       dockerfile: scrape/Dockerfile
@@ -42,7 +42,7 @@ services:
       - 9080:9090
 
   pn1-2:
-    image: barimetrics-mobile/pn1-2:0.0.1
+    image: metrics-experiment/pn1-2:0.0.1
     build:
       context: .
       dockerfile: scrape/Dockerfile
@@ -59,6 +59,23 @@ services:
         prometheusname: n1-2
     ports:
       - 9091:9090
+
+  pdejavu:
+    image: metrics-experiment/pdejavu:0.0.1
+    build:
+      context: .
+      dockerfile: scrape/Dockerfile
+      args:
+        scrapeinterval: 15s
+        evaluationinterval: 10s
+        scrapetimeout: 10s
+        tsdbretention: 2h
+        targetsfile: dejavu.json
+        rulespath: rules
+        startupfile: scrape/startup.sh
+        prometheusname: dejavu
+    ports:
+      - 9090:9090
 
   metrics1:
     image: abilioesteves/metrics-generator:1.0.0
@@ -79,12 +96,5 @@ services:
 
 volumes:
   grafana:
-
-networks:
-  default:
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.5.0/24
 
 

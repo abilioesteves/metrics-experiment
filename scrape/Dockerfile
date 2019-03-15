@@ -1,4 +1,4 @@
-FROM prom/prometheus:v2.4.0
+FROM prom/prometheus:v2.8.0
 
 #### ARGS #####
 
